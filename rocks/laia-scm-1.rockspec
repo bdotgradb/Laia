@@ -27,13 +27,12 @@ dependencies = {
   "cudnn",
   "warp-ctc",
   "optim",
-  "lalarm",
+  "xlua",
   "lua-term",
   "luaposix",
   "lbase64",
   "etlua",
-  "imgdistort",
-  "xlua"
+  "imgdistort"
 }
 
 build = {
