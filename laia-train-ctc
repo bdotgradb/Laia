@@ -140,14 +140,15 @@ if opts.valid_img and not opts.valid_txt then
 end
 
 local checkpoint = laia.Checkpoint():load(opts.checkpoint)
-local model = checkpoint:Last():getModel()
+local model = checkpoint:Best():getModel()
 assert(model ~= nil, 'No model was found in the checkpoint file!')
 
 -- If a GPU is requested, check that we have everything necessary.
 if opts.gpu > 0 then
   assert(cutorch ~= nil, 'Package cutorch is required in order to use the GPU.')
   assert(nn ~= nil, 'Package nn is required in order to use the GPU.')
-  cutorch.setDevice(opts.gpu)
+  -- cutorch.setDevice(opts.gpu)
+  -- no longer need as using CUDA_VISIBLE_DEVICES to determine GPU visibility
   model = model:cuda()
   -- If cudnn_force_convert=true, force all possible layers to use cuDNN impl.
   if cudnn and cudnn.force_convert then
@@ -200,9 +201,12 @@ local rmsprop_opts = {
 
 if opts.continue_train then
   -- Continue training from the last epoch.
-  epoch = checkpoint:Last():getEpoch()
-  if checkpoint:getRMSPropState() then
-    rmsprop_opts = checkpoint:getRMSPropState()
+  epoch = checkpoint:Best():getEpoch()
+  print("Ignoring RMSPropState!")
+  if false then
+    if checkpoint:getRMSPropState() then
+      rmsprop_opts = checkpoint:getRMSPropState()
+    end
   end
   checkpoint:setTrainConfig(opts)
 else
